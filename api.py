@@ -8,4 +8,14 @@ header = {
 
 r = requests.get(url = urls, headers=header)
 data = r.json()
-print(data)
+
+
+satName = data['name']
+
+line1 = data['line1']
+line2 =  data['line2']
+
+print(satName)
+print(line1)
+print(line2)
+ 
