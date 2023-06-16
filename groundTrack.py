@@ -33,7 +33,7 @@ predictedpath = []
 station = create_station('BPL', (23.2599333, 77.4126149, 495.23))
 station2 = create_station('ISL', (lat1NS,  log1EW, MSL1))
  
-for orb in station.visibility(tle, start=Date(2023, 6, 18, 00, 00, 00), stop=timedelta(hours=72), step=timedelta(seconds=100), events=(True)):
+for orb in station.visibility(tle, start=Date(2023, 6, 18, 00, 00, 00), stop=timedelta(hours=1), step=timedelta(seconds=7), events=(True)):
 
 
     elev = np.degrees(orb.phi)
