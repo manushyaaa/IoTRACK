@@ -9,7 +9,6 @@ header = {
 r = requests.get(url = urls, headers=header)
 data = r.json()
 
-
 satName = data['name']
 
 line1 = data['line1']
