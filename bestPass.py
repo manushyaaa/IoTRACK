@@ -24,7 +24,7 @@ local_timezone = tzlocal.get_localzone()
 
 station = create_station('BPL', (23.2599333, 77.4126149, 495.23))
  
-for orb in station.visibility(tle, start=Date(2023, 6, 18, 00, 00, 00), stop=timedelta(hours=48), step=timedelta(seconds=15), events=(True)):
+for orb in station.visibility(tle, start=Date(2023, 6, 16, 00, 00, 00), stop=timedelta(hours=72), step=timedelta(seconds=15), events=(True)):
 
     elev = np.degrees(orb.phi)
     azim = np.degrees(-orb.theta) % 360
