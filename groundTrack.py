@@ -10,7 +10,7 @@ from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
 from beyond.frames import create_station
 
-TWO_LINE_ELEMENT = """ISS (ZARYA)             
+TWO_LINE_ELEMENT = """ISS (ZARYA)
 1 25544U 98067A   23166.52504001  .00012512  00000+0  22070-3 0  9999
 2 25544  51.6424 336.7579 0005373  84.9405  18.0183 15.50777566401535"""
 
