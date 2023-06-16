@@ -1,20 +1,21 @@
 import requests 
+from textwrap import dedent
 
-urls = 'https://tle.ivanstanojevic.me/api/tle/25544'
-header = {
-    'User-Agent': '...',
-    'referer': 'https://...'
-}
+def getTLE(NORAD_ID):
+    urls = f'https://tle.ivanstanojevic.me/api/tle/{NORAD_ID}'
+    header = {
+        'User-Agent': '...',
+        'referer': 'https://...'
+    }
 
-r = requests.get(url = urls, headers=header)
-data = r.json()
+    r = requests.get(url=urls, headers=header)
 
-satName = data['name']
+    data = r.json()
 
-line1 = data['line1']
-line2 =  data['line2']
+    tle1 = """{satname}
+{line1}
+{line2}""".format(satname=data['name'], line1=data['line1'], line2=data['line2'].strip())
 
-print(satName)
-print(line1)
-print(line2)
- 
+    return tle1
+
+  
