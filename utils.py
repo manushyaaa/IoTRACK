@@ -6,6 +6,19 @@ from beyond.dates import Date, timedelta
 
 
 local_timezone = tzlocal.get_localzone() 
+
+def checkLatLog(latNS , logEW):
+
+    if (latNS[len(latNS)-1] =='S'):
+        latNS = ''.join(('-',latNS)) 
+    
+    if (logEW[len(logEW)-1] == 'W' ):
+        logEW = ''.join(('-',logEW))
+    
+    _lat = latNS[:-1]
+    _log = logEW[:-1]
+
+    return float(_lat) , float(_log) 
  
 def timeconverter(_time):
     utc_time = datetime.strptime(_time , "%m/%d/%Y  %H:%M:%S")
