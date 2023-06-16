@@ -33,46 +33,39 @@ predictedpath = []
 station = create_station('BPL', (23.2599333, 77.4126149, 495.23))
 station2 = create_station('ISL', (lat1NS,  log1EW, MSL1))
  
-for orb in station2.visibility(tle, start=Date(2023, 6, 16, 12, 00, 00), stop=timedelta(hours=14), step=timedelta(seconds=15), events=(True)):
+for orb in station.visibility(tle, start=Date(2023, 6, 18, 00, 00, 00), stop=timedelta(hours=72), step=timedelta(seconds=100), events=(True)):
+
 
     elev = np.degrees(orb.phi)
     azim = np.degrees(-orb.theta) % 360
-
     azims.append(azim)
     elevs.append(90 - elev)   
+    r = orb.r / 1000.
+    
+    str1 = orb.date.strftime("%m/%d/%Y  %H:%M:%S")
+    utc_time = datetime.strptime(str1 , "%m/%d/%Y  %H:%M:%S")
+    local_time = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+    
+    _date = local_time.strftime("%m/%d/%Y")
+    _time = local_time.strftime("%H:%M:%S")
 
-    for orb in station.visibility(tle, start=Date(2023, 6, 18, 00, 00, 00), stop=timedelta(hours=24), step=timedelta(seconds=90), events=(True)):
+    
+    #---FOR UTC -----------------------------
+    # _date = orb.date.strftime("%m/%d/%Y")  |
+    # _time = orb.date.strftime("%H:%M:%S")  |
+    #----------------------------------------
 
-
-        elev = np.degrees(orb.phi)
-        azim = np.degrees(-orb.theta) % 360
-        
-        r = orb.r / 1000.
-        
-        str1 = orb.date.strftime("%m/%d/%Y  %H:%M:%S")
-        utc_time = datetime.strptime(str1 , "%m/%d/%Y  %H:%M:%S")
-        local_time = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
-        
-        _date = local_time.strftime("%m/%d/%Y")
-        _time = local_time.strftime("%H:%M:%S")
-
-        
-        #---FOR UTC -----------------------------
-        # _date = orb.date.strftime("%m/%d/%Y")  |
-        # _time = orb.date.strftime("%H:%M:%S")  |
-        #----------------------------------------
-
-        path = {
-            "event" :  orb.event.info if orb.event is not None else "",
-            "date" : _date , 
-            "time" :_time,
-            "azim":azim, 
-            "elev":elev ,
-            "distance" : r , 
-            "radialvelocity" :orb.r_dot 
-        }         
-        
-        predictedpath.append(path)
+    path = {
+        "event" :  orb.event.info if orb.event is not None else "",
+        "date" : _date , 
+        "time" :_time,
+        "azim":azim, 
+        "elev":elev ,
+        "distance" : r , 
+        "radialvelocity" :orb.r_dot 
+    }         
+    
+    predictedpath.append(path)
 
 df = pd.DataFrame(predictedpath) 
  
