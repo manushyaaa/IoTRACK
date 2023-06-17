@@ -1,8 +1,7 @@
-import pytz ,sys    
 import numpy as np 
 import pandas as pd
-import tzlocal , json
-from datetime import datetime
+import tzlocal  
+ 
 from beyond.dates import Date, timedelta 
 from utils import timeconverter,plotPolar
 
@@ -79,11 +78,12 @@ def predictPrecise(satData, station, date, duration, steps, plot , write_to_file
         elevs.append(90 - elev)
         predictedpath.append(path)
  
-        if plot==True :    
-            plotPolar(azims , elevs)
-        if write_to_file==True :    
-            df = pd.DataFrame(predictedpath) 
-            df.to_excel("output.xlsx")  
+    if plot==True :    
+        plotPolar(azims , elevs)
+
+    if write_to_file==True :    
+        df = pd.DataFrame(predictedpath) 
+        df.to_excel("data/predictedPath.xlsx")  
     return predictedpath
  
 
