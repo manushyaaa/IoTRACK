@@ -1,8 +1,8 @@
-import pytz ,sys    
+import pytz ,sys , time    
 import numpy as np 
 import pandas as pd
 import tzlocal , json
-from datetime import datetime
+from datetime import datetime 
 import matplotlib.pyplot as plt
 
 azims = []
@@ -54,7 +54,7 @@ def readData():
 
     
 
-    data = pd.read_excel('predictedPath.xlsx', index_col=0) 
+    data = pd.read_excel('data/predictedPath.xlsx', index_col=0) 
     for index, row in data.iterrows():
     # Access each column value for the current row
         column1_value = row['group']
@@ -68,10 +68,19 @@ def readData():
 
         # Process the data as desired
         print(f'Row {index}: Column1={column1_value}, Column2={column2_value}, Column3={column3_value}Column4={column4_value}, Column5={column5_value}, Column6={column6_value} Column7={column5_value}, Column8={column6_value}')
- 
-
-
    
 
 def serialDump():
-    pass
+ 
+    df = pd.read_excel('G:\STS\data\predictedPath.xlsx')    
+    df['time'] = pd.to_datetime(df['time'])
+    while True:
+        
+        current_time =datetime.now().strftime('%H:%M:%S') 
+        filtered_df = df[df['time'].dt.strftime('%H:%M:%S') == current_time]
+
+        if not filtered_df.empty:
+            columns_to_print = ['group', 'time', 'azim' , 'elev']  # Modify with the actual column names you want to print
+            print('{_current_time} {data}'.format(_current_time = current_time , data = filtered_df.loc[:, columns_to_print].to_string(index=False, header=False)))
+        time.sleep(1)
+    
