@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import tzlocal , json
 from datetime import datetime
-from beyond.dates import Date, timedelta
 import matplotlib.pyplot as plt
 
 azims = []
@@ -50,3 +49,29 @@ def plotPolar(_azims , _elevs):
 
 #for real-time prediction
  
+def readData():
+
+
+    
+
+    data = pd.read_excel('predictedPath.xlsx', index_col=0) 
+    for index, row in data.iterrows():
+    # Access each column value for the current row
+        column1_value = row['group']
+        column2_value = row['event']
+        column3_value = row['date']
+        column4_value = row['time']
+        column5_value = row['azim']
+        column6_value = row['elev']
+        column7_value = row['distance']
+        column8_value = row['radialvelocity']
+
+        # Process the data as desired
+        print(f'Row {index}: Column1={column1_value}, Column2={column2_value}, Column3={column3_value}Column4={column4_value}, Column5={column5_value}, Column6={column6_value} Column7={column5_value}, Column8={column6_value}')
+ 
+
+
+   
+
+def serialDump():
+    pass
