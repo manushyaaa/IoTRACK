@@ -35,7 +35,6 @@ station2 = create_station('ISL', (lat1NS,  log1EW, MSL1))
  
 for orb in station.visibility(tle, start=Date(2023, 6, 18, 00, 00, 00), stop=timedelta(hours=1), step=timedelta(seconds=7), events=(True)):
 
-
     elev = np.degrees(orb.phi)
     azim = np.degrees(-orb.theta) % 360
     azims.append(azim)
