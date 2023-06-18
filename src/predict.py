@@ -64,7 +64,7 @@ def predictPrecise(satData, station, date, duration, steps, plot , write_to_file
             group_id += 1
 
         path = {
-                "group": current_group_id,
+                "group": group_id  ,
                 "event": orb.event.info if orb.event is not None else "",
                 "date": _date,
                 "time": _time,
