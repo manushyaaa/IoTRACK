@@ -1,0 +1,1 @@
+#esptool -c esp8266 -p COM5 erase_flash
