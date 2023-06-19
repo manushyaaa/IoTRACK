@@ -59,16 +59,14 @@ def readData():
         column4_value = row['time']
         column5_value = row['azim']
         column6_value = row['elev']
-        column7_value = row['distance']
-        column8_value = row['radialvelocity']
 
         # Process the data as desired
         print(f'Row {index}: Column1={column1_value}, Column2={column2_value}, Column3={column3_value}Column4={column4_value}, Column5={column5_value}, Column6={column6_value} Column7={column5_value}, Column8={column6_value}')
    
 
 def serialDump():
- 
-    df = pd.read_excel('G:\STS\data\predictedPath.xlsx')    
+  
+    df=pd.read_excel('G:\STS\data\predictedPath.xlsx')    
     df['time'] = pd.to_datetime(df['time'])
     while True:
         
@@ -79,4 +77,20 @@ def serialDump():
             columns_to_print = ['group', 'time', 'azim' , 'elev']  # Modify with the actual column names you want to print
             print('{_current_time} {data}'.format(_current_time = current_time , data = filtered_df.loc[:, columns_to_print].to_string(index=False, header=False)))
         time.sleep(1)
-    
+
+def process_data():
+    df=pd.read_excel('G:\STS\data\predictedPath.xlsx')    
+    df['time'] = pd.to_datetime(df['time'])
+
+    while True:
+        current_time = datetime.now().strftime('%H:%M:%S')
+        filtered_df = df[df['time'].dt.strftime('%H:%M:%S') == current_time]
+
+        if not filtered_df.empty:
+            for index,row in filtered_df.iterrows():
+                group = row[0]
+                time_value = row[4]
+                azim = row[5]
+                elev = row[6]
+                print(f'{time_value} {group} {azim} {elev}')
+        time.sleep(1)

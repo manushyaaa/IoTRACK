@@ -2,7 +2,7 @@ from api import getTLE
 from beyond.frames import create_station
 from beyond.io.tle import Tle
 from beyond.dates import Date  
-from utils import checkLatLog , readData ,serialDump
+from utils import checkLatLog , readData ,serialDump ,process_data
 from predict import predictPrecise 
 import json
 
@@ -32,4 +32,5 @@ steps = 1#precise in seconds
 
 # print(json.dumps(data , indent=2))
  
-serialDump()
+#serialDump()
+process_data()
