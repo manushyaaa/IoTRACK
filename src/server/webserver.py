@@ -7,7 +7,7 @@ app = Flask(__name__)
     
 satellite_data = {}
 def process_data():
-    df = pd.read_excel('G:\STS\data\predictedPath.xlsx') 
+    df = pd.read_excel('G:\STS\data\predictedPath.xls') 
     df['time'] = pd.to_datetime(df['time'])
     while True:
         current_time =datetime.now().strftime('%H:%M:%S') 

@@ -4,24 +4,18 @@ import pandas as pd
 import tzlocal , json
 from datetime import datetime 
 import matplotlib.pyplot as plt
+from geopy.geocoders import Nominatim
 
 azims = []
 elevs = []
 predictedpath = []
 local_timezone = tzlocal.get_localzone() 
+ 
+def getLocation(_userLocation):
+    geolocator = Nominatim(user_agent="MyApp")
+    location = geolocator.geocode(_userLocation)
+    return float(location.latitude), float(location.longitude)
 
-def checkLatLog(latNS , logEW):
-
-    if (latNS[len(latNS)-1] =='S'):
-        latNS = ''.join(('-',latNS)) 
-    
-    if (logEW[len(logEW)-1] == 'W' ):
-        logEW = ''.join(('-',logEW))
-    
-    _lat = latNS[:-1]
-    _log = logEW[:-1]
-
-    return float(_lat) , float(_log) 
  
 def timeconverter(_time):
     utc_time = datetime.strptime(_time , "%m/%d/%Y  %H:%M:%S")
@@ -94,3 +88,17 @@ def process_data():
                 elev = row[6]
                 print(f'{time_value} {group} {azim} {elev}')
         time.sleep(1)
+
+
+def checkLatLog(latNS , logEW):
+
+    if (latNS[len(latNS)-1] =='S'):
+        latNS = ''.join(('-',latNS)) 
+    
+    if (logEW[len(logEW)-1] == 'W' ):
+        logEW = ''.join(('-',logEW))
+    
+    _lat = latNS[:-1]
+    _log = logEW[:-1]
+
+    return float(_lat) , float(_log) 
