@@ -1,4 +1,4 @@
-import pytz ,sys , time    
+import pytz ,sys , time , socket
 import numpy as np 
 import pandas as pd
 import tzlocal , json
@@ -12,15 +12,26 @@ predictedpath = []
 local_timezone = tzlocal.get_localzone() 
  
 def getLocation(_userLocation):
-    geolocator = Nominatim(user_agent="MyApp")
-    location = geolocator.geocode(_userLocation)
-    return float(location.latitude), float(location.longitude)
-
+    try : 
+        geolocator = Nominatim(user_agent="MyApp")
+        location = geolocator.geocode(_userLocation)
+        lat = round(float(location.latitude), 5)
+        lon = round(float(location.longitude), 5)
+        return lat,lon
+    
+    except Exception as e : 
+        print('An error occured while retrieving the location : ',e)
+        return None 
  
+
 def timeconverter(_time):
-    utc_time = datetime.strptime(_time , "%m/%d/%Y  %H:%M:%S")
-    local_time = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
-    return local_time
+    try : 
+        utc_time = datetime.strptime(_time , "%m/%d/%Y  %H:%M:%S")
+        local_time = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+        return local_time
+    except Exception as e : 
+        print('An Error occured while converting time', e)
+        return None
 
 
 #for plotting polar charts 
@@ -102,3 +113,22 @@ def checkLatLog(latNS , logEW):
     _log = logEW[:-1]
 
     return float(_lat) , float(_log) 
+
+def generateTabularJSON(data):
+
+    data_list = json.loads(data)
+    column_name = list(data_list[0].keys())
+    print('\t'.join(column_name))
+    for item in data_list : 
+        print('\t'.join(str(item[column]) for column in column_name))
+ 
+
+def check_internet_connection():
+    try:
+        # Attempt to connect to a reliable website
+        socket.create_connection(("www.google.com", 80))
+        return True
+    except OSError:
+        return False
+
+ 

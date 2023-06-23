@@ -2,31 +2,33 @@ from api import getTLE
 from beyond.frames import create_station
 from beyond.io.tle import Tle
 from beyond.dates import Date  
-from utils import getLocation,  checkLatLog , readData ,serialDump ,process_data
-from predict import predictPrecise, predictNow
+from utils import getLocation, check_internet_connection   
+from predict import predictNow ,Predict
 import json
 
-NORAD_ID = 25544
+if check_internet_connection() : 
+    print("starting...")
+        
+    NORAD_ID = 25544
 
-prefix = 'BPL'
-# latNS = '23.2599333N'
-# logEW = '77.4126149E'
+    prefix = 'BPL'
+    MSL =  495.23 
 
-MSL =  495.23
+    
+    latNS , logEW = getLocation("Old Subhash Nagar Bhopal") 
+    station = create_station(prefix, (latNS,  logEW, MSL))
 
-latNS , logEW = getLocation("Old Subhash Nagar Bhopal")
+    
+    satData = Tle(getTLE(NORAD_ID)).orbit()
 
-satData = Tle(getTLE(NORAD_ID)).orbit()
-# latNS , logEW = checkLatLog(latNS , logEW)
+    
+    
+    date =   Date(2023, 6, 24, 12, 00, 00, scale="UTC")     #(YYYY,M,D,HR,MIN,SEC)
+    duration = 12                        #predict in hours 
+    steps = 30                           #precison upto (in seconds)
 
-station = create_station(prefix, (latNS,  logEW, MSL))
-
-date = Date(2023,6,23,00,00,00)#(YYYY,M,D,HR,MIN,SEC)
-duration = 4#in hours 
-steps = 1#precise in seconds 
-
-# predictNow(satData , station, plot=False)
-
+    #predictNow(satData , station ) # predicts 24hrs 
+    Predict(satData ,station)
 # data = predictPrecise( satData ,
 #                        station , 
 #                        date , 
@@ -41,3 +43,5 @@ steps = 1#precise in seconds
 
 
 #process_data()
+else : 
+    print("Network connectivity error , pls check your internet connection")
