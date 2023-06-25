@@ -1,2 +1,0 @@
-# STSWebApp
- IoTrack WebApp

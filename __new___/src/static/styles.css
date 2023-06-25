@@ -1,0 +1,46 @@
+.time-container {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    text-align: right;
+}
+
+.message-container {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+}
+
+.debug{
+    
+    bottom: 10px;
+    right: 10px;
+    text-align: right;
+}
+
+form {
+    margin-top: 10px;
+}
+
+form input[type="submit"] {
+    margin-right: 10px;
+}
+
+form label {
+    margin-right: 5px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 50%;
+}
+
+th, td {
+    border: 2px solid black;
+    padding: 1px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
