@@ -55,6 +55,7 @@
             <div class="table-container">
                 <table>
                     <tr>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Date</th>
                         <th>Time</th>
@@ -63,6 +64,7 @@
                     </tr>
                     {% for path in prediction %}
                         <tr>
+                            <td>{{ path.group }}</td>
                             <td>{{ path.name }}</td>
                             <td>{{ path.date }}</td>
                             <td>{{ path.time }}</td>

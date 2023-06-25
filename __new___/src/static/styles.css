@@ -20,7 +20,7 @@ body {
     grid-area: 1 / 2 / 2 / 3;
     align-self: flex-end;
     text-align: right;
-    color: #888;
+    color: #a7a7a7;
   }
   
   /* Time container */
@@ -31,7 +31,7 @@ body {
     justify-content: center;
     align-items: flex-start;
     padding-right: 20px;
-    color: #888;
+    color: #a7a7a7;
     font-size: 15px;
   }
   
