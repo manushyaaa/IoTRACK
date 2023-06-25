@@ -34,18 +34,15 @@ def mainPage():
  
 
     if request.method == 'POST':
-        if 'submit_button_tle' in request.form:
-             
-            satName = request.form.get('user_input')
-            session['satName'] = satName
-             
+        if 'submit_button_time' in request.form:
+            
 
-        elif 'submit_button_loc' in request.form:
-            location = request.form.get('user_input')
+            satName = request.form.get('user_input0')
+            session['satName'] = satName
+            
+            location = request.form.get('user_input1')
             session['location'] = location
              
-
-        elif 'submit_button_time' in request.form:
             prediction_start_date = request.form.get('prediction_start_date')
             prediction_end_date = request.form.get('prediction_end_date')
           

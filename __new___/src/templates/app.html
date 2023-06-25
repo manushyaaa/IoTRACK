@@ -4,79 +4,80 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <title>IoTRACK</title>
-     
-     
-
 </head>
 <body>
-    <div class="debug">
-        {% if satName %}
-        <p>Satellite: {{ satName }}</p>
-        {% endif %}
-
-        {% if location %}
-        <p>Location: {{ location }}</p>
-        {% endif %}
-    </div>
-    
-    <div class="time-container">
-        <h3>Time Display</h3>
-        <p id="ist-time"></p>
-        <p id="utc-time"></p>
-    </div>
-
-    <form action="{{ url_for('mainPage') }}" method="post">
-        <label for="user_input">Enter SatName :</label>
-        <input type="text" id="user_input0" name="user_input">
-        <input type="submit" value="Submit" name="submit_button_tle">
-    </form>
-    
-    
-    <form action="{{ url_for('mainPage') }}" method="post">
-        <label for="user_input">Enter Location :</label>
-        <input type="text" id="user_input1" name="user_input">
-        <input type="submit" value="Submit" name="submit_button_loc">
-    </form>
-
-    <h1>Prediction Time Input</h1>
-    <form  action="{{ url_for('mainPage') }}" method="post">
-        <label for="prediction_start_date">Prediction Start Date:</label>
-        <input type="date" id="prediction_start_date" name="prediction_start_date"><br>
-
-    
-        <label for="prediction_end_date">Prediction End Date:</label>
-        <input type="date" id="prediction_end_date" name="prediction_end_date"><br>
+   
  
-        <input type="submit" value="Predict" name="submit_button_time">
-    </form>
-    <h2>Predicted Path</h2>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Azi</th>
-            <th>Elev</th>
-        </tr>
-        {% for path in prediction %}
-            <tr>
-                <td>{{ path.name }}</td>
-                <td>{{ path.date }}</td>
-                <td>{{ path.time }}</td>
-                <td>{{ path.azi }}</td>
-                <td>{{ path.elev }}</td>
-            </tr>
-            {% if path.name == 'LOS' %}
-              <tr>
-                <td colspan="5" height = 20px></td> 
-              </tr>  
-            {% endif %}
-        {% endfor %}
-    </table>
-<!--     
-    <form action="{{ url_for('index') }}" method="post">
-        <input type="submit" value="Predict Next Pass" name="button2">
-    </form> -->
 
+
+    <div class="dashboard">
+        
+        <div class="debug">
+            <h2>IoTRACK</h2>
+            {% if satName %}
+            <p>Satellite: {{ satName }}</p>
+            {% endif %}
+
+            {% if location %}
+            <p>Location: {{ location }}</p>
+            {% endif %}
+        </div>
+
+        <div class="time-container">
+            <h2>Time Display</h2>
+            <p id="ist-time"></p>
+            <p id="utc-time"></p>
+             
+        </div>
+
+        <div class="input-section">    
+            <h2>Prediction Time Input</h2>
+            <form  action="{{ url_for('mainPage') }}" method="post">
+                <label for="user_input0">Enter SatName :</label>
+                <input type="text" id="user_input0" name="user_input0">
+                 
+                <label for="user_input1">Enter Location :</label>
+                <input type="text" id="user_input1" name="user_input1">
+                 
+
+                <label for="prediction_start_date">Prediction Start Date:</label>
+                <input type="date" id="prediction_start_date" name="prediction_start_date"><br>
+
+                <label for="prediction_end_date">Prediction End Date:</label>
+                <input type="date" id="prediction_end_date" name="prediction_end_date"><br>
+
+                <input type="submit" value="Predict" name="submit_button_time">
+            </form>
+        </div>
+
+        <div class="prediction-section">
+            <h2>Predicted Path</h2>
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Azi</th>
+                        <th>Elev</th>
+                    </tr>
+                    {% for path in prediction %}
+                        <tr>
+                            <td>{{ path.name }}</td>
+                            <td>{{ path.date }}</td>
+                            <td>{{ path.time }}</td>
+                            <td>{{ path.azi }}</td>
+                            <td>{{ path.elev }}</td>
+                        </tr>
+                        {% if path.name == 'LOS' %}
+                        <tr>
+                            <td colspan="5" height="20px"></td> 
+                        </tr>  
+                        {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
