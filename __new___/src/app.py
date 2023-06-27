@@ -1,26 +1,14 @@
-from flask import Flask, render_template, session, request
-from utils import getTLE, getLocation
-from skyfield.api import wgs84 ,load
-import numpy as np
+from flask import Flask, render_template, session, request, redirect
+from predictor import predict 
 from datetime import datetime
-import time ,json
-import sqlite3
-from sqlite3 import Error
+
+ 
 
 app = Flask(__name__)
 app.secret_key = 'key'
  
-ts = load.timescale()
 
-def create_connection():
-    conn = None
-    try:
-        conn = sqlite3.connect('database.db')  # Replace 'database.db' with your desired database file name
-        return conn
-    except Error as e:
-        print(e)
-
-    return conn
+ 
 
 
 @app.route('/')
@@ -29,6 +17,7 @@ def index():
 
 @app.route('/app', methods=['GET', 'POST'])
 def mainPage():
+
     if 'satName' not in session:
         session['satName'] = None
     if 'location' not in session:
@@ -36,16 +25,13 @@ def mainPage():
     if 'predictionStartTime' not in session:
         session['predictionStartTime'] = None
     if 'predictionEndTime' not in session:
-        session['predictionEndTime'] = None
-
- 
+        session['predictionEndTime'] = None 
 
     satName = session['satName']
-    location = session['location']
-    # prediction = session['prediction']
- 
+    location = session['location'] 
 
     if request.method == 'POST':
+        show_predictor = False
         if 'submit_button_time' in request.form:
             
 
@@ -70,105 +56,30 @@ def mainPage():
             end_month = end_date.month
             end_day = end_date.day
 
-            prediction = predict(start_year , start_month , start_day , end_year , end_month , end_day)
-
-            return render_template('app.html', satName=satName, location=location, prediction = prediction)
+            prediction = predict(start_year , start_month , start_day , end_year , end_month , end_day , satName , location)
+          
+            if prediction is not None : 
+                show_predictor = True
+          
+            return render_template('app.html', satName=satName, location=location, prediction = prediction , show_predictor = show_predictor )
              
 
-    return render_template('app.html', satName=satName, location=location)
+    return render_template('app.html', satName=satName, location=location  )
+
+@app.route('/loadTLE', methods=['GET', 'POST'])
+def loadTLE():
+    if request.method == 'POST':
+
+        amateur_checked = 'amateur' in request.form
+        weather_checked = 'weather' in request.form
+        cubesat_checked = 'cubesat' in request.form
+        other_checked = 'other' in request.form
+
+        # loadTLE(amateur_checked , weather_checked ,cubesat_checked , other_checked)
 
 
+        return redirect('/app')
 
-def predict(sy , sm , sd , ey , em , ed):
-
-    try :
-        predictedPath = []
-        t = ts.now()
-    
-        satellite = getTLE(session['satName'])
-        latNS, logEW = getLocation(session['location'])
-        bpl = wgs84.latlon(latNS, logEW)
-
-
-        difference = satellite - bpl
-
-        predictionStartTime=  ts.utc(sy , sm, sd)
-        predictionEndTime = ts.utc( ey , em , ed)
-
-
-        t , events  = satellite.find_events(bpl, predictionStartTime, predictionEndTime , altitude_degrees=0)
-        event_names = 'AOS', 'MAX', 'LOS'
-
-
-        group_id = 0
-        current_group_id = None
-
-        for (ti, event) in zip(t, events):
-
-            timePath = ti
-            topocentric = difference.at(timePath)
-            alt, az, distance = topocentric.altaz()
-
-            name = event_names[event]
-
-        
-
-            if name == 'AOS':
-                current_group_id = group_id
-                group_id += 1
-
-            path = {
-                'group' : group_id,
-                'name' : name , 
-                'date' : ti.utc_strftime('%d-%b-%y'),
-                'time' : ti.utc_strftime('%H:%M:%S'),
-                'azi' :  np.round(alt.degrees, 2),
-                'elev' : np.round(az.degrees, 2)
-            }
-            predictedPath.append(path)
-            conn = create_connection()
-            if conn:
-                cursor = conn.cursor()
-                cursor.execute("DROP TABLE IF EXISTS predicted_path")  # Clear the existing table if it exists
-                cursor.execute(
-                    """
-                    CREATE TABLE IF NOT EXISTS predicted_path (
-                        group_id INTEGER,
-                        name TEXT,
-                        date TEXT,
-                        time TEXT,
-                        azi REAL,
-                        elev REAL
-                    )
-                    """
-                )  # Create the table to store the predicted path
-
-                for path in predictedPath:
-                    cursor.execute(
-                        """
-                        INSERT INTO predicted_path (group_id, name, date, time, azi, elev)
-                        VALUES (?, ?, ?, ?, ?, ?)
-                        """,
-                        (
-                            path['group'],
-                            path['name'],
-                            path['date'],
-                            path['time'],
-                            path['azi'],
-                            path['elev'],
-                        ),
-                    )  # Insert each path into the table
-
-                conn.commit()
-                conn.close()
-            
-
-             
-            
-        return predictedPath
-    except Exception as e : 
-        print("Prediction Error : " , e)
-        return None
 
 if __name__ == '__main__':
     app.run(debug=True)
