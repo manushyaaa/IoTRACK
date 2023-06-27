@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <title>IoTRACK</title>
 </head>
+
 <body>
-   
- 
+
+
 
 
     <div class="dashboard">
-        
+
         <div class="debug">
             <h2>IoTRACK</h2>
             {% if satName %}
@@ -27,18 +29,39 @@
             <h2>Time Display</h2>
             <p id="ist-time"></p>
             <p id="utc-time"></p>
-             
+
         </div>
 
-        <div class="input-section">    
+        <div class="input-section">
             <h2>Prediction Time Input</h2>
-            <form  action="{{ url_for('mainPage') }}" method="post">
+              
+            <form action="{{ url_for('loadTLE') }}" method="POST">
+                <label>
+                    <input type="checkbox" name="amateur"> Amateur
+                </label><br>
+                <label>
+                    <input type="checkbox" name="weather"> Station
+                </label><br>
+                <label>
+                    <input type="checkbox" name="cubesat"> Cubesat
+                </label><br>
+                <label>
+                    <input type="checkbox" name="other"> Other
+                </label><br>
+            
+                <!-- Add more checkboxes as needed -->
+            
+                <button type="submit">Load TLEs</button>
+            </form>
+            
+            
+            <form action="{{ url_for('mainPage') }}" method="post">
                 <label for="user_input0">Enter SatName :</label>
                 <input type="text" id="user_input0" name="user_input0">
-                 
+
                 <label for="user_input1">Enter Location :</label>
                 <input type="text" id="user_input1" name="user_input1">
-                 
+
 
                 <label for="prediction_start_date">Prediction Start Date:</label>
                 <input type="date" id="prediction_start_date" name="prediction_start_date"><br>
@@ -50,6 +73,7 @@
             </form>
         </div>
 
+        {% if show_predictor %}
         <div class="prediction-section">
             <h2>Predicted Path</h2>
             <div class="table-container">
@@ -63,23 +87,25 @@
                         <th>Elev</th>
                     </tr>
                     {% for path in prediction %}
-                        <tr>
-                            <td>{{ path.group }}</td>
-                            <td>{{ path.name }}</td>
-                            <td>{{ path.date }}</td>
-                            <td>{{ path.time }}</td>
-                            <td>{{ path.azi }}</td>
-                            <td>{{ path.elev }}</td>
-                        </tr>
-                        {% if path.name == 'LOS' %}
-                        <tr>
-                            <td colspan="5" height="20px"></td> 
-                        </tr>  
-                        {% endif %}
+                    <tr>
+                        <td>{{ path.group }}</td>
+                        <td>{{ path.name }}</td>
+                        <td>{{ path.date }}</td>
+                        <td>{{ path.time }}</td>
+                        <td>{{ path.azi }}</td>
+                        <td>{{ path.elev }}</td>
+                    </tr>
+                    {% if path.name == 'LOS' %}
+                    <tr>
+                        <td colspan="5" height="20px"></td>
+                    </tr>
+                    {% endif %}
                     {% endfor %}
                 </table>
-            </div>
-        </div>
-    </div>
+            </div> <!--  for table-container -->
+        </div><!--  for prediction-section  -->
+        {% endif %}
+    </div><!--  for dashboard -->
 </body>
+
 </html>

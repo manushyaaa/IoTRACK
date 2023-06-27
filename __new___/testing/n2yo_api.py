@@ -3,7 +3,7 @@ from geopy.geocoders import Nominatim
 from datetime import datetime
 
 API_KEY = 'L4VF35-H3JFP4-6WRCWN-51V8'
-NORAD_ID = 25544
+NORAD_ID = 28654
 def generateTabularJSON(data):
 
     data_list = json.loads(data)
@@ -19,14 +19,18 @@ def getLocation(_userLocation):
         location = geolocator.geocode(_userLocation)
         lat = round(float(location.latitude), 5)
         lon = round(float(location.longitude), 5)
+        
+
+        lat , lon = 23.24871118985121, 77.43505588150911
+        print(lat ,lon)
         return lat,lon
     
     except Exception as e : 
         print('An error occured while retrieving the location : ',e)
         return None 
  
-observer_lat , observer_lng = getLocation('Old Subhash Nagar , Bhopal')
-MSL =  495.23 
+observer_lat , observer_lng = 23.24871118985121, 77.43505588150911
+MSL =  504
 
 def getTLE(NORAD_ID):
     try : 
@@ -47,7 +51,7 @@ def getTLE(NORAD_ID):
 
 def getRadioPasses(NORAD_ID, observer_lat, observer_lng, MSL, API_KEY):
     try:
-        urls = f'https://api.n2yo.com/rest/v1/satellite/radiopasses/{NORAD_ID}/{observer_lat}/{observer_lng}/{MSL}/{1}/{1}&apiKey={API_KEY}'
+        urls = f'https://api.n2yo.com/rest/v1/satellite/radiopasses/{NORAD_ID}/{observer_lat}/{observer_lng}/{MSL}/{10}/{1}&apiKey={API_KEY}'
         header = {
             'User-Agent': '...',
             'referer': 'https://...'
