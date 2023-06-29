@@ -28,7 +28,9 @@ def getLocation(_userLocation):
     except Exception as e : 
         print('An error occured while retrieving the location : ',e)
         return None 
- 
+
+#precise location for BPL : 23.24871118985121, 77.43505588150911
+
 observer_lat , observer_lng = 23.24871118985121, 77.43505588150911
 MSL =  504
 
