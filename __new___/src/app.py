@@ -2,15 +2,9 @@ from flask import Flask, render_template, session, request, redirect
 from predictor import predict 
 from datetime import datetime
 
- 
-
 app = Flask(__name__)
 app.secret_key = 'key'
  
-
- 
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
