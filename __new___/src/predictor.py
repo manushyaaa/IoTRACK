@@ -11,7 +11,8 @@ def predict(sy , sm , sd , ey , em , ed , satName , location ):
     
         satellite = getTLE(satName)
         latNS, logEW = getLocation(location)
-        bpl = wgs84.latlon(23.24871118985121, 77.43505588150911)
+        #bpl = wgs84.latlon(23.24871118985121, 77.43505588150911)
+        bpl = wgs84.latlon(latNS , logEW)
 
 
         difference = satellite - bpl
