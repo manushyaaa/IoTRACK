@@ -1,8 +1,8 @@
 '''
 utils.py
-Date: 2021-10-23 03:55:00
+Date: 2021-10-23 13:51:00
 Python Version: 3.11.5
-Functions: getTLE, getLocation, create_connection , predict
+Functions: getTLE, getLocation, create_connection , predict , predictPrecise , getPredictedPath
 '''
 
 from geopy import Nominatim
@@ -15,11 +15,13 @@ import pandas as pd
 import datetime, pytz
 from tabulate import tabulate
 
+global SATNAME , LOCATION
+ 
 
 def create_connection():
     conn = None
     try:
-        conn = sqlite3.connect('G:\\MinorProject\\built23JUN\\op\\database.db')  # Replace 'database.db' with your desired database file name
+        conn = sqlite3.connect('G:\MinorProject\IoTRACK\\built23JUN\op\database.db')  # Replace 'database.db' with your desired database file name
         return conn
     except Error as e:
         print(e)
@@ -36,7 +38,7 @@ def getTLE(satName):
     # Attempt to load TLE data from each URL
     for url in urls:
         try:
-            os.chdir('G:\\MinorProject\\built23JUN\\op')
+            os.chdir('G:\MinorProject\IoTRACK\\built23JUN\op')
             satellites = load.tle_file(url)
             by_name = {sat.name: sat for sat in satellites}
             if satName in by_name:
@@ -61,11 +63,42 @@ def getLocation(_userLocation):
     except Exception as e : 
         print('An error occured while retrieving the location : ',e)
 
+def getPredictedPath(GROUP_ID):
+    conn = create_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+
+            cursor.execute(f"SELECT timeUTC from predicted_path WHERE group_id ={GROUP_ID} AND name = 'AOS' ")   
+            ROW = cursor.fetchone()
+
+            if ROW : 
+                predictionStartTime = ROW[0]
+
+            cursor.execute(f"SELECT timeUTC from predicted_path WHERE group_id ={GROUP_ID} AND name = 'LOS' ")  
+            ROW = cursor.fetchone()
+
+            if ROW : 
+                predictionEndTime = ROW[0]
+            
+            cursor.execute(f"SELECT date from predicted_path WHERE group_id ={GROUP_ID} AND name = 'AOS' ")   
+            ROW = cursor.fetchone()
+
+            if ROW : 
+                _date = ROW[0]
+
+            conn.close()
+            return predictionStartTime, predictionEndTime , _date
+        except Exception as e:
+            print(f"An error occurred while getting the predicted path: {e}")
+            conn.close()
+            return None
+    return None
 
 ts = load.timescale()
+t = ts.now()
 
 def predict():
-
     try:
         # Get user inputs for prediction and call the predict function
         # start_year = int(input("Enter the start year: "))
@@ -76,12 +109,18 @@ def predict():
         # end_day = int(input("Enter the end day: "))
         sy = 2023
         sm = 10
-        sd = 23
+        sd = 24
         ey = 2023
         em = 10
-        ed = 24
+        ed = 30
         satName = str(input("Enter the satellite name: "))
         location = input("Enter the location: ")
+
+        global SATNAME 
+        SATNAME = satName 
+
+       
+
         predictedPath = []
         t = ts.now()
 
@@ -89,6 +128,10 @@ def predict():
         latNS, logEW = getLocation(location)
         bpl = wgs84.latlon(latNS, logEW)
 
+
+        global LOCATION 
+        LOCATION = location
+        
         difference = satellite - bpl
 
         predictionStartTime = ts.utc(sy, sm, sd)
@@ -119,8 +162,8 @@ def predict():
                 'date': ti.utc_strftime('%d-%b-%y'),
                 'timeIST': ti.astimezone(pytz.timezone('Asia/Kolkata')).strftime("%H:%M:%S"),
                 'timeUTC': ti.astimezone(pytz.timezone('UTC')).strftime("%H:%M:%S"),
-                'azi': np.round(alt.degrees, 2),
-                'elev': np.round(az.degrees, 2)
+                'elev': np.round(alt.degrees, 2),
+                'azi': np.round(az.degrees, 2)
             }
             predictedPath.append(path)
 
@@ -172,7 +215,7 @@ def predict():
             print(info)
             print(table)
             
-        return df
+        return df , satName , location
     except Exception as e:
         print("Prediction Error : ", e)
         return pd.DataFrame()  
@@ -180,48 +223,112 @@ def predict():
 def predictPrecise():
     try:
         whichGroup = int(input("Enter the group number: "))
-        ps , pe = getPredictedPath(whichGroup)
+
+        ps , pe , date = getPredictedPath(whichGroup)
+
         predictionStartTime = datetime.datetime.strptime(ps, '%H:%M:%S')
         predictionEndTime = datetime.datetime.strptime(pe, '%H:%M:%S')
+        ps_date_formatted = datetime.datetime.strptime(date, '%d-%b-%y')
+
         ps_formatted = predictionStartTime.strftime('%H%M%S')
-        pe_formatted = predictionEndTime.strftime('%H%M%S')
-        print( ps_formatted, pe_formatted)
+        pe_formatted = predictionEndTime.strftime('%H%M%S')         
+        ps_date_formatted = ps_date_formatted.strftime('%Y%m%d')
 
+        pe_start_hour = int(pe_formatted[0:2])
+        pe_start_min = int(pe_formatted[2:4])
+        pe_start_sec = int(pe_formatted[4:6])
 
+        ps_end_hour = int(ps_formatted[0:2])
+        ps_end_min = int(ps_formatted[2:4])
+        ps_end_sec = int(ps_formatted[4:6])
 
-
-
-
-
+        ps_date_year = int(ps_date_formatted[0:4])
+        ps_date_month = int(ps_date_formatted[4:6])
+        ps_date_day = int(ps_date_formatted[6:8])
         
+        print(ps_date_year, ps_date_month, ps_date_day)
+        print( ps_end_hour, ps_end_min, ps_end_sec)
+        print(pe_start_hour, pe_start_min, pe_start_sec)
+        ist_timezone = pytz.timezone('Asia/Kolkata')
+
+        satellite = getTLE(SATNAME)
+        latNS, logEW = getLocation(LOCATION) 
+        bpl = wgs84.latlon(latNS, logEW )
+
+        difference = satellite - bpl
+
+        predictionEndTime = ts.utc(ps_date_year, ps_date_month, ps_date_day, pe_start_hour, pe_start_min, pe_start_sec)
+        predictionStartTime = ts.utc(ps_date_year, ps_date_month,  ps_date_day, ps_end_hour, ps_end_min, ps_end_sec)
+            
+        interval = 2
+        
+        current_time = predictionStartTime
+        predictedPath = []
+        conn = create_connection()
+        while current_time.tt <= predictionEndTime.tt:
+            ti = current_time
+            difference = satellite - bpl
+            topocentric = difference.at(ti)
+            alt, az, distance = topocentric.altaz()
 
 
+            if  alt.degrees >= 0 :
+                
+                ti_ist = ti.astimezone(ist_timezone)
+                ist_date = ti_ist.strftime('%d-%b-%y')
+                ist_time = ti_ist.strftime('%H:%M:%S')
 
+                path = {
+                    'date': ist_date,
+                    'timeIST': ist_time,
+                    'timeUTC': ti.utc_strftime('%H:%M:%S'),
+                    'elev': np.round(az.degrees, 2),
+                    'azi': np.round(alt.degrees, 2)
+                }
+
+                predictedPath.append(path)
+
+            # Increment the current time by the interval
+            current_time += datetime.timedelta(seconds=interval)
+    
+            
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("DROP TABLE IF EXISTS precisePredict")  # Clear the existing table if it exists
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS precisePredict (
+                
+                    date TEXT,
+                    timeIST TEXT,
+                    timeUTC TEXT,
+                    azi REAL,
+                    elev REAL
+                )
+                """
+            )  # Create the table to store the predicted path
+
+            for path in predictedPath:
+                cursor.execute(
+                    """
+                    INSERT INTO precisePredict ( date, timeIST ,timeUTC, azi, elev)
+                    VALUES ( ?, ?,?, ?, ?)
+                    """,
+                    (   
+                        
+                        path['date'],
+                        path['timeIST'],
+                        path['timeUTC'],
+                        path['azi'],
+                        path['elev']
+                    ),
+                )  # Insert each path into the table
+
+            conn.commit()
+            conn.close() 
+
+            print("done")
+ 
     except Exception as e:
         print(f"An error occurred while predicting the path: {e}")
-
-def getPredictedPath(GROUP_ID):
-    conn = create_connection()
-    if conn:
-        try:
-            cursor = conn.cursor()
-
-            cursor.execute(f"SELECT timeUTC from predicted_path WHERE group_id ={GROUP_ID} AND name = 'AOS' ")   
-            ROW = cursor.fetchone()
-
-            if ROW : 
-                predictionStartTime = ROW[0]
-
-            cursor.execute(f"SELECT timeUTC from predicted_path WHERE group_id ={GROUP_ID} AND name = 'LOS' ")  
-            ROW = cursor.fetchone()
-
-            if ROW : 
-                predictionEndTime = ROW[0]
-
-            conn.close()
-            return predictionStartTime, predictionEndTime
-        except Exception as e:
-            print(f"An error occurred while getting the predicted path: {e}")
-            conn.close()
-            return None
-    return None
+ 
