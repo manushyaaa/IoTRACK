@@ -6,6 +6,7 @@ Functions: main_menu (main)
 '''
 
 from utils import getTLE, getLocation, create_connection, predict, predictPrecise, getPredictedPath
+from serialServer import startSerialServer
 from skyfield.api import wgs84, load
 
 def main_menu():
@@ -23,7 +24,9 @@ def main_menu():
                     print("Options:")
                     print("1. PredictPrecise")
                     print("2. Predict Again")
-                    print("3. Exit")
+                    print("3. Start Server")
+                    print("4. Show Visualisation")
+                    print("5. Exit")
                     choice = input("Enter your choice (1, 2, or 3): ")
 
                     if choice == "1":
@@ -31,6 +34,11 @@ def main_menu():
                     elif choice == "2":
                         predict()
                     elif choice == "3":
+                        startSerialServer()
+                    elif choice == "4":
+                       # startVisualizationThread() 
+                        pass
+                    elif choice == "5":
                         print("Exiting...")
                         return
                     else:

@@ -13,15 +13,45 @@ import os
 from skyfield.api import wgs84, load
 import numpy as np
 import pandas as pd
-import datetime
+import datetime , time
 import pytz
 from tabulate import tabulate
 from termcolor import colored  # Import the termcolor library for coloring text
+import matplotlib.pyplot as plt
+import math
 
+ 
 global SATNAME, LOCATION
 ts = load.timescale()
 t = ts.now()
+ 
+# Initialize the figure and axis outside the plot_motor_position function
+fig, ax = plt.subplots(figsize=(6, 6))
 
+def plot_motor_position(degree):
+    ax.clear()  # Clear the previous plot
+
+    # Create a circle representing the motor's range (0-360 degrees)
+    circle = plt.Circle((0, 0), 0.5, color='lightgray', fill=False, linewidth=1.5)
+    ax.add_patch(circle)
+
+    # Convert degrees to radians
+    radian = math.radians(degree)
+
+    # Create a line representing the motor's current position
+    x = [0, 0.5 * math.cos(radian)]
+    y = [0, 0.5 * math.sin(radian)]
+    ax.plot(x, y, color='blue', linewidth=2)
+
+    # Set axis properties
+    ax.set_xlim(-0.7, 0.7)
+    ax.set_ylim(-0.7, 0.7)
+    ax.set_aspect('equal', adjustable='box')
+    ax.axis('off')
+
+    # Display the updated visualization
+    plt.draw()
+    plt.pause(1)
 
 def create_connection():
     conn = None
@@ -33,7 +63,6 @@ def create_connection():
     except Error as e:
         print(e)
     return conn
-
 
 def getTLE(satName):
     # Define a list of URLs to check for TLE data
@@ -57,7 +86,6 @@ def getTLE(satName):
     print(f"Satellite '{satName}' not found in any of the provided URLs.")
     return None
 
-
 def getLocation(_userLocation):
 
     try:
@@ -71,7 +99,6 @@ def getLocation(_userLocation):
 
     except Exception as e:
         print('An error occured while retrieving the location : ', e)
-
 
 def getPredictedPath(GROUP_ID):
     conn = create_connection()
@@ -108,10 +135,8 @@ def getPredictedPath(GROUP_ID):
             return None
     return None
 
-
 def colorize(val, color):
     return colored(val, color)
-
 
 def predict():
     try:
@@ -266,7 +291,6 @@ def predict():
         print("Prediction Error : ", e)
         return pd.DataFrame()
 
-
 def predictPrecise():
     try:
         whichGroup = int(input("Enter the group number: "))
@@ -375,7 +399,30 @@ def predictPrecise():
             conn.commit()
             conn.close()
 
-            print("done")
+            print("Populated the precisePredict table with the predicted path.")
+
+          
 
     except Exception as e:
         print(f"An error occurred while predicting the path: {e}")
+
+def generatePos():
+
+    satName = 'ISS (ZARYA)'
+    location = 'Chennai'
+
+    satellite = getTLE(satName)
+    latNS, logEW = getLocation(location)
+    bpl = wgs84.latlon(latNS, logEW)
+     
+    t = ts.now()
+    difference = satellite - bpl
+    topocentric = difference.at(t)
+    alt, az, distance = topocentric.altaz()
+    elev = np.round(alt.degrees, 2)
+    azi = np.round(az.degrees, 2)
+
+  
+   
+    return elev, azi
+ 
